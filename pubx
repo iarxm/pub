@@ -1,0 +1,421 @@
+#!/bin/sh
+#############################################
+# img to img - convert
+# extract pdf pages - pdfjam
+# img to pdf with text - tesseract
+#############################################
+
+case "$cmd"
+	docx)
+		# .docx micropsoft to pdf
+		;;
+esac
+
+exit
+
+# prs
+in="$1"
+trg="$2"
+out_ext="$3"
+
+if [ -n $4 ]; then
+	shift 3
+	varn="$@"
+fi
+
+outp=$(printf "$in" | rev | cut -d "." -f 2- | rev)
+out="$outp.$out_ext"
+
+if [ ! -d pdc ]; then mkdir pdc; fi
+rm pdc/$in
+cp $in pdc/
+cd pdc
+
+pandoc \
+	$varn \
+	$var1 \
+	$var2 \
+	-s --mathjax -i -t $trg $in -o $out
+
+mv $out ../
+
+cd ..
+
+
+
+
+#############################################
+# prs.reveal
+in="$1"
+trg="revealjs"
+out_ext="html"
+
+var=" \
+	-V transition=none \
+	-V theme=white \
+	-V navigationMode=linear \
+	-V controls=false \
+	"
+
+pdc.prs $in $trg $out_ext $var
+
+
+#var="theme=simple"
+#var1="theme=white"
+#var2="transition=none"
+#var3=""
+#var="theme=simple"
+
+
+#############################################
+# prs.slidy
+
+out=$(printf "$1" | rev | cut -d "." -f 2- | rev)
+pandoc -s --mathjax -i -t slidy $1 -o "$out.html"
+
+
+##########################################
+# beamer
+opt=$2
+pandoc $opt \
+	-t beamer \
+	"$1" \
+	-o "$1.pdf"
+
+#############################################
+# z
+if [ -n $4 ]; then
+	var1="-V $4"
+fi
+
+if [ -n $5 ]; then 
+	var2="-V $5"
+fi
+
+
+
+##########################################
+##########################################
+# pzaset
+printf "%s" "$@" > $HOME/.local/bin/pd/pzasetf
+
+# pzasetf
+pdcmdpdf.b
+
+
+##########################################
+file_in="$1"
+file_out="$2"
+
+pandoc \
+	-f html -t markdown \
+	"$file_in" \
+	-o "$file_out"
+
+
+
+
+
+
+# TODO: segment parts into functions/cases
+# #############################################
+# DS 
+# ##############################################
+
+##################################################
+# With preprocessing
+cd /home/iao/d/dsa
+pre="$1"
+dst="$pre.md"
+
+xls=$(ls | grep "$pre".x)
+
+if [ ! -n $ls ]; then
+		echo "no files"
+		exit 1
+fi
+
+for f in $xls; do
+	echo "$f contents --> $dst"
+	printf "\%%%% preprocessed file generated through script\n" > $dst
+	cat $f >> $dst
+done
+
+#pdcmdpdf.gg "$dst"
+
+
+
+################################################
+# doc.pp
+# TODO 
+# - make the specific directories as variables 
+# 	- and then create specific cases of the script that feeds eg 'gg' to it..
+#	- separate pandoc command from moving commands..
+doc=$1
+opt=$@
+
+head="$HOME/dp/md/mdhead.tex"
+
+name="$(printf "%s\n" "$doc" | cut -d "." -f 1-2)"
+#name="$doc"
+out_doc="review.$name.$(date +y%yd%j).pdf"
+out_dira="$HOME/xsrfv/gg/$name/aa.docs"
+out_dirb="$HOME/iao/ffdsxr"
+out_a="$out_dira/$out_doc"
+out_b="$out_dirb/$out_doc"
+
+if [ ! -f "$doc" ]; then 
+	printf "%s\n" "no input"
+	exit 0
+fi
+if [ ! -e out_dira ]; then mkdir $out_dira; fi
+
+pandoc -V geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \
+		-f markdown \
+		-t pdf \
+		-H $head \
+		-o $out_a \
+		$doc
+
+cp $out_a $out_b
+
+
+##################################################
+# doc.x
+doc=$1
+opt=$@
+head="$HOME/dp/md/mdhead.tex"
+
+name="$(printf "%s\n" "$doc" | cut -d "." -f 1-2)"
+#name="$doc"
+out_doc="review.$name.$(date +y%yd%j).pdf"
+out_dira="$HOME/xsrfv/gg/$name/aa.docs"
+out_dirb="$HOME/iao/ffdsxr"
+out_a="$out_dira/$out_doc"
+out_b="$out_dirb/$out_doc"
+
+if [ ! -f "$doc" ]; then 
+	printf "%s\n" "no input"
+	exit 0
+fi
+if [ ! -e out_dira ]; then mkdir $out_dira; fi
+
+pandoc -V geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \
+		-f markdown \
+		-t pdf \
+		-H $head \
+		-o $out_a \
+		$doc
+
+cp $out_a $out_b
+
+###############################################
+# docs
+pdc.ds.pp "$1"
+pdcmdpdf.gg "$1.md"
+
+#############################################
+# pdf
+# pandocs list of review names
+# how to take tom,ror, nic etc and put ls as revtom, revror etc..?
+for n in $(cat $1); do
+	pdc.mdpdf $n
+done
+
+
+# #############################################
+# OTHER
+# ##############################################
+
+################################################
+# p.a
+prg_a="$(cat $XDG_BIN_HOME/pdc.asetf)"
+$prg_a
+
+
+##################################################
+# pdf
+#!/bin/sh
+doc=$1
+opt=$@
+pandoc -V geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \
+		-o $doc.pdf \
+		$doc
+
+#################################################
+# pdf.cmds
+pdfjam $in $pages -o $out
+pdfimages $in $image_root
+
+
+#################################################
+# pm
+
+
+#!/bin/sh
+doc=$1
+head="$HOME/dp/md/mdhead.tex"
+doc_out="$doc.$(date +y%yd%j).pdf"
+#head=" "
+
+pandoc \
+	-V geometry:"\
+	top=2cm, \
+	bottom=1.5cm, \
+	left=2cm, \
+	right=2cm" \
+	\
+	-f markdown \
+	-H $head \
+	-t pdf \
+	-o $doc_out \
+	$doc
+
+#	-V classoption:twocolum \
+#	-V classoption=twocolum \
+# 	--toc \
+#	--template=/home/iao/dp/md/article.template \
+
+
+##############################################
+#############################################
+# pm.a 
+doc=$1
+opt=$@
+pandoc -V geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \
+		-f markdown \
+		-t latex \
+		-o $doc.pdf \
+		$doc
+
+##############################################
+#############################################
+# pm.b
+doc=$1
+opt=$@
+head="$HOME/dp/arti/fusu.head.tex"
+#head="$HOME/dp/md/mdhead.tex"
+
+pandoc \
+	$doc -o $doc.pdf \
+	-H $head \
+	-f markdown \
+	--shift-heading-level-by=-1 \
+    	--pdf-engine=xelatex \
+    	--indented-code-classes=javascript \
+    	--highlight-style=monochrome \
+    	-V papersize=A4 \
+	-V usepackage="palatino" \
+	-V geometry:margin=1in \
+
+#	--number-sections \
+#    	--table-of-contents                \
+#    	-V documentclass=report            \
+#    	-V mainfont="Palatino Linotype"     \
+
+##############################################
+#############################################
+# pm.tst
+
+#!/bin/sh
+doc=$1
+opt=$@
+heada="$HOME/dp/arti.fusu/fusu.head.tex"
+
+name="$(printf "%s\n" "$doc" | cut -d "." -f 1-2)"
+doc_out="review.$name.$(date +y%yd%j).pdf"
+out="$doc_out"		#output to 'dse' for testing
+
+geo_a='geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \'
+pandoc -V \
+		-V papersize=A4 \
+		-f markdown \
+		-t pdf \
+		-H "$heada" \
+		-o $out \
+		$doc
+
+#dir_out="/home/iao/xsrfv/gg/$name/aa.feedback"
+
+##############################################
+#############################################
+# pmx.head
+
+#!/bin/sh
+doc=$1
+opt=$@
+head="$HOME/dp/md/mdhead.tex"
+
+pandoc \
+		-V geometry:"\
+			top=2cm, \
+			bottom=1.5cm, \
+			left=2cm, \
+			right=2cm" \
+		-f markdown \
+		-t pdf \
+		-H $head \
+		-o $doc.pdf \
+		$doc
+
+##############################################
+#############################################
+# pmx.meet
+doc=$1
+opt=$@
+pandoc -V geometry:"\
+		top=1.5cm, \
+		left=4cm, \
+		bottom=1.5cm" \
+		-f markdown \
+		-t latex \
+		-o $doc.pdf \
+		$doc
+
+##############################################
+#############################################
+# pmx.meet
+doc=$1
+opt=$@
+head="$HOME/dp/md/mdhead.tex"
+doc_out="$doc.$(date +y%yd%j).tex"
+
+pandoc -V geometry:"\
+		top=2cm, \
+		bottom=1.5cm, \
+		left=2cm, \
+		right=2cm" \
+		-f markdown \
+		-H $head \
+		-t latex \
+		-o $doc_out \
+
+##############################################
+# img2pdg
+
+ls *.tif | xargs -I% convert % %.pdf
+pdftk *.pdf cat output merged.pdf && rm *.png.pdf
+	$doc
+
+
+
